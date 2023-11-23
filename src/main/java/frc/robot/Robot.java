@@ -148,6 +148,7 @@ public class Robot extends TimedRobot {
     // button to toggle between velocity and smart motion modes
     SmartDashboard.putBoolean("Mode", true);
     SmartDashboard.putNumber("Encoder Position", m_alternateEncoder.getPosition());
+    SmartDashboard.putNumber("PPR", m_alternateEncoder.getCountsPerRevolution());
   }
 
   @Override
