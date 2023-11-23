@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.RelativeEncoder;
-//import com.revrobotics.SparkMaxAlternateEncoder;
+import com.revrobotics.SparkMaxAlternateEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -54,9 +54,9 @@ public class Robot extends TimedRobot {
   private static final int deviceID = 13;
   private CANSparkMax m_motor;
   private SparkMaxPIDController m_pidController;
-  private RelativeEncoder m_encoder;
-  //private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
-  //private static final int kCPR = 8192;
+  //private RelativeEncoder m_encoder;
+  private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
+  private static final int kCPR = 8192;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
   
   /**
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
    * Encoder, the type should be set to quadrature and the counts per 
    * revolution set to 8192
    */
-  //private RelativeEncoder m_alternateEncoder;
+  private RelativeEncoder m_alternateEncoder;
 
   @Override
   public void robotInit() {
@@ -78,14 +78,15 @@ public class Robot extends TimedRobot {
      * parameters will not persist between power cycles
      */
     m_motor.restoreFactoryDefaults();
-    // m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
+    m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
     // m_alternateEncoder.setInverted(true);
     // m_alternateEncoder.setPositionConversionFactor(360);
 
     // initialze PID controller and encoder objects
     m_pidController = m_motor.getPIDController();
-    m_encoder = m_motor.getEncoder();
-    //m_pidController.setFeedbackDevice(m_encoder);
+    m_alternateEncoder = m_motor.getEncoder();
+    m_pidController.setFeedbackDevice(m_alternateEncoder);
+    m_motor.burnFlash();
 
     // PID coefficients
     kP = 5e-5; 
@@ -146,7 +147,7 @@ public class Robot extends TimedRobot {
 
     // button to toggle between velocity and smart motion modes
     SmartDashboard.putBoolean("Mode", true);
-    SmartDashboard.putNumber("Encoder Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Encoder Position", m_alternateEncoder.getPosition());
   }
 
   @Override
@@ -184,7 +185,7 @@ public class Robot extends TimedRobot {
     if(mode) {
       setPoint = SmartDashboard.getNumber("Set Velocity", 0);
       m_pidController.setReference(setPoint, CANSparkMax.ControlType.kVelocity);
-      processVariable = m_encoder.getVelocity();
+      processVariable = m_alternateEncoder.getVelocity();
     } else {
       setPoint = SmartDashboard.getNumber("Set Position", 0);
       /**
@@ -193,13 +194,13 @@ public class Robot extends TimedRobot {
        * the control type to kSmartMotion
        */
       m_pidController.setReference(setPoint, CANSparkMax.ControlType.kSmartMotion);
-      processVariable = m_encoder.getPosition();
+      processVariable = m_alternateEncoder.getPosition();
     }
     
     SmartDashboard.putNumber("SetPoint", setPoint);
     SmartDashboard.putNumber("Process Variable", processVariable);
     SmartDashboard.putNumber("Output", m_motor.getAppliedOutput());
-    SmartDashboard.putNumber("Encoder Position", m_encoder.getPosition());
+    SmartDashboard.putNumber("Encoder Position", m_alternateEncoder.getPosition());
 
   }
 }
