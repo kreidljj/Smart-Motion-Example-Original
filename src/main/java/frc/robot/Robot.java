@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
   private SparkMaxPIDController m_pidController;
   //private RelativeEncoder m_encoder;
   private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
-  private static final int kCPR = 8192;
+  private static final int kCPR = 8192;//4096;//8192;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
   
   /**
@@ -78,6 +78,7 @@ public class Robot extends TimedRobot {
      * parameters will not persist between power cycles
      */
     m_motor.restoreFactoryDefaults();
+    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
     // m_alternateEncoder.setInverted(true);
     // m_alternateEncoder.setPositionConversionFactor(360);
