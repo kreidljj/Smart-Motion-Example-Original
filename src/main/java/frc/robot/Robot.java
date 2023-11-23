@@ -53,6 +53,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class Robot extends TimedRobot {
   private static final int deviceID = 13;
   private CANSparkMax m_motor;
+  private CANSparkMax m_motorR;
   private SparkMaxPIDController m_pidController;
   //private RelativeEncoder m_encoder;
   private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
@@ -70,14 +71,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // initialize motor
-    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
+    m_motorR = new CANSparkMax(deviceID, MotorType.kBrushless);
 
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
      * in the SPARK MAX to their factory default state. If no argument is passed, these
      * parameters will not persist between power cycles
      */
-    m_motor.restoreFactoryDefaults();
+    m_motorR.restoreFactoryDefaults();
     m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
     m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
     // m_alternateEncoder.setInverted(true);
