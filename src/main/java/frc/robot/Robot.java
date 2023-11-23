@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxAlternateEncoder;
@@ -53,11 +54,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class Robot extends TimedRobot {
   private static final int deviceID = 13;
   private CANSparkMax m_motor;
-  private CANSparkMax m_motorR;
   private SparkMaxPIDController m_pidController;
   //private RelativeEncoder m_encoder;
-  private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
-  private static final int kCPR = 8192;//4096;//8192;
+  public static SparkMaxAbsoluteEncoder m_alternateEncoder;
+  //private RelativeEncoder m_alternateEncoder;
+  //private static final SparkMaxAlternateEncoder.Type kAltEncType = SparkMaxAlternateEncoder.Type.kQuadrature;
+  //private static final int kCPR = 8192;//4096;//8192;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
   
   /**
@@ -66,27 +68,29 @@ public class Robot extends TimedRobot {
    * Encoder, the type should be set to quadrature and the counts per 
    * revolution set to 8192
    */
-  private RelativeEncoder m_alternateEncoder;
+
 
   @Override
   public void robotInit() {
     // initialize motor
-    m_motorR = new CANSparkMax(deviceID, MotorType.kBrushless);
+    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
 
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration parameters
      * in the SPARK MAX to their factory default state. If no argument is passed, these
      * parameters will not persist between power cycles
      */
-    m_motorR.restoreFactoryDefaults();
-    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
-    m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
+    //m_motor.restoreFactoryDefaults();
+    m_alternateEncoder = m_motor.getAbsoluteEncoder(SparkMaxAbsoluteEncoder.Type.kDutyCycle);
+    //m_alternateEncoder = m_motor.getAbsoluteEncoder(null);
     // m_alternateEncoder.setInverted(true);
-    // m_alternateEncoder.setPositionConversionFactor(360);
+
+    m_alternateEncoder.setPositionConversionFactor(360);
+    m_alternateEncoder.setZeroOffset(71.5);
 
     // initialze PID controller and encoder objects
     m_pidController = m_motor.getPIDController();
-    m_alternateEncoder = m_motor.getEncoder();
+    //m_alternateEncoder = m_motor.getEncoder();
     m_pidController.setFeedbackDevice(m_alternateEncoder);
     m_motor.burnFlash();
 
@@ -150,7 +154,8 @@ public class Robot extends TimedRobot {
     // button to toggle between velocity and smart motion modes
     SmartDashboard.putBoolean("Mode", true);
     SmartDashboard.putNumber("Encoder Position", m_alternateEncoder.getPosition());
-    SmartDashboard.putNumber("PPR", m_alternateEncoder.getCountsPerRevolution());
+    //SmartDashboard.putNumber("PPR", m_alternateEncoder.getCountsPerRevolution());
+    //SmartDashboard.putValue("Motor Type",m_motor.getMotorType());
   }
 
   @Override
