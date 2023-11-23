@@ -79,6 +79,8 @@ public class Robot extends TimedRobot {
      */
     m_motor.restoreFactoryDefaults();
     m_alternateEncoder = m_motor.getAlternateEncoder(kAltEncType, kCPR);
+    m_alternateEncoder.setInverted(true);
+    m_alternateEncoder.setPositionConversionFactor(360);
 
     // initialze PID controller and encoder objects
     m_pidController = m_motor.getPIDController();
